@@ -23,10 +23,16 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        // If response is not JSON (e.g., HTML error page), create a generic error
+        throw new Error(`Login failed: ${res.status} ${res.statusText}`);
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || "Something went wrong failed");
+        throw new Error(data.message || "Login failed");
       }
 
       // In a real app we might not need the token if httpOnly, but login context expects data

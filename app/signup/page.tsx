@@ -23,10 +23,16 @@ export default function SignupPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        // If response is not JSON (e.g., HTML error page), create a generic error
+        throw new Error(`Signup failed: ${res.status} ${res.statusText}`);
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(data.message || "Signup failed");
       }
 
       login("mock-token", data.user);
